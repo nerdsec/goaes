@@ -81,3 +81,8 @@ GLOBAL OPTIONS:
 - https://en.wikipedia.org/wiki/Salt_(cryptography)
 - https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 - https://words.filippo.io/2025-state/
+
+## inspiration
+
+- https://github.com/FiloSottile/age
+- https://github.com/restic/restic
