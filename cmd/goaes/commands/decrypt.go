@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"encoding/gob"
+	"log/slog"
 	"os"
 
 	"github.com/nerdsec/goaes/internal"
@@ -17,7 +18,12 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			slog.Error("failed to close file", "error", err)
+		}
+	}()
 
 	enc := gob.NewDecoder(file)
 
@@ -33,7 +39,10 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	os.WriteFile(destination, plaintext, 0666)
+	err = os.WriteFile(destination, plaintext, 0666)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
