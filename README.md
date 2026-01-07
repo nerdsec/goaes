@@ -21,7 +21,8 @@ I wanted to write some Go and encryption fascinates me, so I wrote `goaes`.
 
 ## getting started
 
-1. Generate a new main key.
+1. Generate a new passphrase.
+2. Generate a new salt.
 
 ```bash
 goaes generate
@@ -31,13 +32,18 @@ Don't use this one. This one is mine.
 
 ```bash
 XGfpiNUvKJy8k7KeUEyhev4jkTIajb1s9CMJP9xH/7A=
+tjrXXdH+0/NXSsaDOYuGtEM2zXxWFNPXSPXoli5++iE=
 ```
 
-2. Set `SECRET_KEY` to the value of the key you generated.
-3. Run the `goaes` command.
+3. Set `GOAES_PASSPHRASE` to the passphrase.
+4. Set `GOAES_SALT` to the salt.
+5. Run the `goaes` command.
 
 ```bash
-SECRET_KEY=XGfpiNUvKJy8k7KeUEyhev4jkTIajb1s9CMJP9xH/7A= goaes encrypt -s ./input.txt -d ./output.enc
+export GOAES_PASSPHRASE=XGfpiNUvKJy8k7KeUEyhev4jkTIajb1s9CMJP9xH/7A=
+export GOAES_SALT=tjrXXdH+0/NXSsaDOYuGtEM2zXxWFNPXSPXoli5++iE=
+
+goaes encrypt -s ./input.txt -d ./output.enc
 ```
 
 ### usage
