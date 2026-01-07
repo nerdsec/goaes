@@ -41,33 +41,38 @@ func NewKEKFromEnvB64(passphraseEnvVar string, salt Salt) (KEK, error) {
 }
 
 func NewDEK() (DEK, error) {
-	key := make([]byte, 32)
+	key := make([]byte, keyLen)
 	if _, err := io.ReadFull(rand.Reader, key); err != nil {
 		return nil, fmt.Errorf("random DEK gen: %w", err)
 	}
+
 	return DEK(key), nil
 }
 
 func NewSalt() (Salt, error) {
-	key := make([]byte, 32)
+	key := make([]byte, keyLen)
 	if _, err := io.ReadFull(rand.Reader, key); err != nil {
 		return nil, fmt.Errorf("random salt gen: %w", err)
 	}
+
 	return Salt(key), nil
 }
 
 func WrapDEK(dek DEK, kek KEK) (WrappedDEK, error) {
 	edek, err := encryptAEAD([]byte(dek), []byte(kek), aadWrapDEK)
+
 	return WrappedDEK(edek), err
 }
 
 func UnwrapDEK(edek WrappedDEK, kek KEK) (DEK, error) {
 	dek, err := decryptAEAD([]byte(edek), []byte(kek), aadWrapDEK)
+
 	return DEK(dek), err
 }
 
 func EncryptData(plaintext []byte, dek DEK) (Ciphertext, error) {
 	ct, err := encryptAEAD(plaintext, []byte(dek), aadDataMsg)
+
 	return Ciphertext(ct), err
 }
 
@@ -121,6 +126,7 @@ func decryptAEAD(ciphertext, key, aad []byte) ([]byte, error) {
 
 	nonce := ciphertext[:ns]
 	body := ciphertext[ns:]
+
 	return gcm.Open(nil, nonce, body, aad)
 }
 

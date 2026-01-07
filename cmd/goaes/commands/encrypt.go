@@ -32,7 +32,7 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	err = os.WriteFile(destination, dataBuffer.Bytes(), 0666)
+	err = os.WriteFile(destination, dataBuffer.Bytes(), fileMode)
 	if err != nil {
 		return err
 	}

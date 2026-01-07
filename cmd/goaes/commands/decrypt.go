@@ -39,7 +39,7 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	err = os.WriteFile(destination, plaintext, 0666)
+	err = os.WriteFile(destination, plaintext, fileMode)
 	if err != nil {
 		return err
 	}
