@@ -1,12 +1,6 @@
 package internal
 
-import (
-	"github.com/joho/godotenv"
-)
-
 func Encrypt(data []byte) (EncryptedDataPayload, error) {
-	godotenv.Load()
-
 	kek, err := NewKEKFromEnvB64("GOAES_PASSPHRASE", "GOAES_SALT")
 	if err != nil {
 		return EncryptedDataPayload{}, err
