@@ -8,8 +8,7 @@ I wanted to write some Go and encryption fascinates me, so I wrote `goaes`.
 
 ### what it is
 
-- it's a fun project
-- it uses [key wrapping](https://en.wikipedia.org/wiki/Key_wrap)
+- it's fun
 - it's fast
 - it's simple
 
@@ -18,6 +17,11 @@ I wanted to write some Go and encryption fascinates me, so I wrote `goaes`.
 - it's not meant for production
 - it's not meant for sensitive data
 - it's not secure
+
+## how it works
+
+- it uses [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)
+- it uses [key wrapping](https://en.wikipedia.org/wiki/Key_wrap)
 
 ## getting started
 
