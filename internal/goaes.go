@@ -20,8 +20,8 @@ const (
 )
 
 func NewKEKFromEnvB64(passphraseEnvVar, saltEnvVar string) (KEK, error) {
-	b64 := os.Getenv(passphraseEnvVar)
-	if b64 == "" {
+	b64Passphrase := os.Getenv(passphraseEnvVar)
+	if b64Passphrase == "" {
 		return nil, fmt.Errorf("%s is not set", passphraseEnvVar)
 	}
 
@@ -30,7 +30,7 @@ func NewKEKFromEnvB64(passphraseEnvVar, saltEnvVar string) (KEK, error) {
 		return nil, fmt.Errorf("%s is not set", saltEnvVar)
 	}
 
-	passphrase, err := base64.StdEncoding.DecodeString(b64)
+	passphrase, err := base64.StdEncoding.DecodeString(b64Passphrase)
 	if err != nil {
 		return nil, fmt.Errorf("decode %s base64: %w", passphraseEnvVar, err)
 	}
