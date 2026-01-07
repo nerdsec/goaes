@@ -28,7 +28,7 @@ I wanted to write some Go and encryption fascinates me, so I wrote `goaes`.
 goaes generate
 ```
 
-Don't use this one. This one is mine.
+Don't use these. These are mine.
 
 ```bash
 XGfpiNUvKJy8k7KeUEyhev4jkTIajb1s9CMJP9xH/7A=
