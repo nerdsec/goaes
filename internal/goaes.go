@@ -4,57 +4,61 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 
-	"golang.org/x/crypto/pbkdf2"
+	"golang.org/x/crypto/argon2"
 )
 
 const (
-	keyIterations = 600_000
-	keyLength     = 32
+	time    = 3
+	memory  = 256 * 1024
+	threads = 4
+	keyLen  = 32
 )
 
-func NewKEKFromEnvB64(passphraseEnvVar, saltEnvVar string) (KEK, error) {
+func NewKEKFromEnvB64(passphraseEnvVar string) (KEK, Salt, error) {
 	b64Passphrase := os.Getenv(passphraseEnvVar)
 	if b64Passphrase == "" {
-		return nil, fmt.Errorf("%s is not set", passphraseEnvVar)
-	}
-
-	b64Salt := os.Getenv(saltEnvVar)
-	if b64Salt == "" {
-		return nil, fmt.Errorf("%s is not set", saltEnvVar)
+		return nil, nil, fmt.Errorf("%s is not set", passphraseEnvVar)
 	}
 
 	passphrase, err := base64.StdEncoding.DecodeString(b64Passphrase)
 	if err != nil {
-		return nil, fmt.Errorf("decode %s base64: %w", passphraseEnvVar, err)
+		return nil, nil, fmt.Errorf("decode %s base64: %w", passphraseEnvVar, err)
 	}
 
-	salt, err := base64.StdEncoding.DecodeString(b64Salt)
+	salt, err := NewSalt()
 	if err != nil {
-		return nil, fmt.Errorf("decode %s base64: %w", saltEnvVar, err)
+		return nil, nil, fmt.Errorf("failed to create salt %w", err)
 	}
 
-	raw := pbkdf2.Key(passphrase, salt, keyIterations, keyLength, sha256.New)
+	raw := argon2.IDKey(passphrase, salt, time, memory, threads, keyLen)
 
 	if !validAESKeyLen(len(raw)) {
-		return nil, errBadKeyLn
+		return nil, nil, errBadKeyLn
 	}
 
-	return KEK(raw), nil
+	return KEK(raw), Salt(salt), nil
 }
 
 func NewDEK() (DEK, error) {
-	key := make([]byte, 32) // AES-256
+	key := make([]byte, 32)
 	if _, err := io.ReadFull(rand.Reader, key); err != nil {
 		return nil, fmt.Errorf("random DEK gen: %w", err)
 	}
 	return DEK(key), nil
+}
+
+func NewSalt() (Salt, error) {
+	key := make([]byte, 32)
+	if _, err := io.ReadFull(rand.Reader, key); err != nil {
+		return nil, fmt.Errorf("random salt gen: %w", err)
+	}
+	return Salt(key), nil
 }
 
 func WrapDEK(dek DEK, kek KEK) (WrappedDEK, error) {

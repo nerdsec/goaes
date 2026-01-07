@@ -7,10 +7,12 @@ type (
 	DEK        []byte
 	WrappedDEK []byte
 	Ciphertext []byte
+	Salt       []byte
 )
 
 type EncryptedDataPayload struct {
 	DEK     WrappedDEK
+	Salt    Salt
 	Payload Ciphertext
 }
 
