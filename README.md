@@ -1,3 +1,4 @@
+
 # goaes
 
 `goaes` is a very simple tool for encrypting files with AES-256 GCM.
@@ -20,32 +21,32 @@ I wanted to write some Go and encryption fascinates me, so I wrote `goaes`.
 
 ## how it works
 
-- it uses [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)
+- it uses [Argon2id](https://en.wikipedia.org/wiki/Argon2)
+	- time: `3`
+	- memory: `256mb`
+	- threads: `4`
+	- key length: `32`
 - it uses [key wrapping](https://en.wikipedia.org/wiki/Key_wrap)
 
 ## getting started
 
 1. Generate a new passphrase.
-2. Generate a new salt.
 
 ```bash
 goaes generate
 ```
 
-Don't use these. These are mine.
+Don't use this one. This one is mine.
 
-```bash
+```
 XGfpiNUvKJy8k7KeUEyhev4jkTIajb1s9CMJP9xH/7A=
-tjrXXdH+0/NXSsaDOYuGtEM2zXxWFNPXSPXoli5++iE=
 ```
 
-3. Set `GOAES_PASSPHRASE` to the passphrase.
-4. Set `GOAES_SALT` to the salt.
-5. Run the `goaes` command.
+2. Set `GOAES_PASSPHRASE` to the passphrase.
+3. Run the `goaes` command.
 
 ```bash
 export GOAES_PASSPHRASE=XGfpiNUvKJy8k7KeUEyhev4jkTIajb1s9CMJP9xH/7A=
-export GOAES_SALT=tjrXXdH+0/NXSsaDOYuGtEM2zXxWFNPXSPXoli5++iE=
 
 goaes encrypt -s ./input.txt -d ./output.enc
 ```
@@ -68,3 +69,15 @@ COMMANDS:
 GLOBAL OPTIONS:
    --help, -h  show help
 ```
+
+## reference material
+
+- https://en.wikipedia.org/wiki/Key_wrap
+- https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
+- https://en.wikipedia.org/wiki/Galois/Counter_Mode
+- https://en.wikipedia.org/wiki/Authenticated_encryption
+- https://en.wikipedia.org/wiki/Argon2
+- https://en.wikipedia.org/wiki/Key_derivation_function
+- https://en.wikipedia.org/wiki/Salt_(cryptography)
+- https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+- https://words.filippo.io/2025-state/
