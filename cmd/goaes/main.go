@@ -48,6 +48,20 @@ func main() {
 				Aliases: []string{"d"},
 				Usage:   "Decrypt a file",
 				Action:  commands.Decrypt,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "source",
+						Aliases:  []string{"s"},
+						Usage:    "source file to decrypt",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "destination",
+						Aliases:  []string{"d"},
+						Usage:    "where to write the decrypted file",
+						Required: true,
+					},
+				},
 			},
 		},
 	}

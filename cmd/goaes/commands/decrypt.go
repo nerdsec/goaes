@@ -2,11 +2,38 @@ package commands
 
 import (
 	"context"
+	"encoding/gob"
+	"os"
 
+	"github.com/nerdsec/goaes/internal"
 	"github.com/urfave/cli/v3"
 )
 
 func Decrypt(ctx context.Context, cmd *cli.Command) error {
+	source := cmd.String("source")
+	destination := cmd.String("destination")
+
+	file, err := os.Open(source)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	enc := gob.NewDecoder(file)
+
+	var encryptedPayload internal.EncryptedDataPayload
+
+	err = enc.Decode(&encryptedPayload)
+	if err != nil {
+		return err
+	}
+
+	plaintext, err := internal.Decrypt(encryptedPayload.DEK, encryptedPayload.Payload)
+	if err != nil {
+		return err
+	}
+
+	os.WriteFile(destination, plaintext, 0666)
 
 	return nil
 }
