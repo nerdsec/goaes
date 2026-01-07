@@ -9,10 +9,15 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+var (
+	version = "dev"
+)
+
 func main() {
 	cmd := &cli.Command{
-		Name:  "goaes",
-		Usage: "Simple AES encryption built with Go",
+		Name:    "goaes",
+		Usage:   "Simple AES encryption built with Go",
+		Version: version,
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			return cli.DefaultShowRootCommandHelp(cmd)
 		},
