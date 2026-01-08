@@ -16,11 +16,11 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 	destination := cmd.StringArg("destination")
 
 	if source == "" {
-		return cli.Exit("missing source", 2)
+		return cli.Exit("missing source", invalidArgsExit)
 	}
 
 	if destination == "" {
-		return cli.Exit("missing destination", 2)
+		return cli.Exit("missing destination", invalidArgsExit)
 	}
 
 	source = filepath.Clean(source)

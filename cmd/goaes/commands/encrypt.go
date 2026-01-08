@@ -16,7 +16,7 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 	destination := cmd.StringArg("destination")
 
 	if source == "" {
-		return cli.Exit("missing source file", 2)
+		return cli.Exit("missing source file", invalidArgsExit)
 	}
 
 	if destination == "" {
