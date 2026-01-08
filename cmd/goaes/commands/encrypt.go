@@ -15,6 +15,10 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 	source := cmd.StringArg("source")
 	destination := cmd.StringArg("destination")
 
+	if source == "" {
+		return cli.Exit("missing source file", 2)
+	}
+
 	if destination == "" {
 		destination = source + ".goaes"
 	}
