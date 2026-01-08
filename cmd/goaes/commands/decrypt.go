@@ -12,8 +12,16 @@ import (
 )
 
 func Decrypt(ctx context.Context, cmd *cli.Command) error {
-	source := cmd.String("source")
-	destination := cmd.String("destination")
+	source := cmd.StringArg("source")
+	destination := cmd.StringArg("destination")
+
+	if source == "" {
+		return cli.Exit("missing source", 2)
+	}
+
+	if destination == "" {
+		return cli.Exit("missing destination", 2)
+	}
 
 	source = filepath.Clean(source)
 	file, err := os.Open(source)
