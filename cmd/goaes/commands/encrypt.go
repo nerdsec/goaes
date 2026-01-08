@@ -12,8 +12,12 @@ import (
 )
 
 func Encrypt(ctx context.Context, cmd *cli.Command) error {
-	source := cmd.String("source")
-	destination := cmd.String("destination")
+	source := cmd.StringArg("source")
+	destination := cmd.StringArg("destination")
+
+	if destination == "" {
+		destination = source + ".goaes"
+	}
 
 	source = filepath.Clean(source)
 	plaintext, err := os.ReadFile(source)
