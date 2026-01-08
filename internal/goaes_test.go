@@ -11,7 +11,10 @@ import (
 const (
 	totalIterationTests = 10
 	minSize             = 32
-	validPassphrase     = "dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg="
+	minWrappedDEKSize   = 60
+
+	//nolint:gosec // this is only for testing and not used for any implementation
+	validPassphrase = "dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg="
 )
 
 func TestNewDEK(t *testing.T) {
@@ -23,7 +26,7 @@ func TestNewDEK(t *testing.T) {
 			}
 
 			if len(dek) < minSize {
-				t.Errorf("dek too small")
+				t.Errorf("dek too small, dek: %v len: %d", dek, len(dek))
 			}
 		})
 	}
@@ -38,7 +41,7 @@ func TestNewSalt(t *testing.T) {
 			}
 
 			if len(salt) < minSize {
-				t.Errorf("salt too small")
+				t.Errorf("salt too small, salt: %v len: %d", salt, len(salt))
 			}
 		})
 	}
@@ -110,5 +113,9 @@ func TestWrapDEK(t *testing.T) {
 
 	if bytes.Equal(dek, edek) {
 		t.Error("dek should not be the same as edek")
+	}
+
+	if len(edek) < minWrappedDEKSize {
+		t.Errorf("edek too small, edek: %v len: %d", edek, len(edek))
 	}
 }
