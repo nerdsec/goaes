@@ -74,7 +74,6 @@ func DecryptData(ct Ciphertext, dek DEK) ([]byte, error) {
 	return decryptAEAD([]byte(ct), []byte(dek), aadDataMsg)
 }
 
-// encryptAEAD returns: nonce || ciphertext
 func encryptAEAD(plaintext, key, aad []byte) ([]byte, error) {
 	if !validAESKeyLen(len(key)) {
 		return nil, errBadKeyLn
