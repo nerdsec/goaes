@@ -44,6 +44,7 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	destination = filepath.Clean(destination)
 	err = os.WriteFile(destination, dataBuffer.Bytes(), fileMode)
 	if err != nil {
 		return err
