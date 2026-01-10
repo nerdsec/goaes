@@ -4,3 +4,4 @@
 *.txt
 # Added by goreleaser init:
 dist/
+*.goaes
