@@ -1,7 +1,7 @@
 
 # goaes
 
-`goaes` is a very simple tool for encrypting files with AES-256 GCM.
+`goaes` is a very simple tool for encrypting files with AES-256-GCM.
 
 ## about
 
@@ -54,20 +54,16 @@ goaes encrypt ./input.txt
 ```
 hexdump -C ./input.txt.goaes
 
-00000000  3e 7f 03 01 01 14 45 6e  63 72 79 70 74 65 64 44  |>.....EncryptedD|
-00000010  61 74 61 50 61 79 6c 6f  61 64 01 ff 80 00 01 03  |ataPayload......|
-00000020  01 03 44 45 4b 01 0a 00  01 04 53 61 6c 74 01 0a  |..DEK.....Salt..|
-00000030  00 01 07 50 61 79 6c 6f  61 64 01 0a 00 00 00 ff  |...Payload......|
-00000040  8d ff 80 01 3c b6 8c 2a  3d bb 28 f0 20 1f 45 d2  |....<..*=.(. .E.|
-00000050  6b 31 1d ba 6e dc 4b b5  b8 ba 01 52 b7 be e2 84  |k1..n.K....R....|
-00000060  c9 25 b5 2c fc 13 c7 49  aa 70 d3 7e ab 78 4c 49  |.%.,...I.p.~.xLI|
-00000070  f2 1b 8b 50 1a 06 d3 bf  fc cd 29 73 74 27 05 8c  |...P......)st'..|
-00000080  cc 01 20 13 74 7e 13 e7  39 09 9d 93 85 52 59 88  |.. .t~..9....RY.|
-00000090  21 9c 31 84 39 65 f7 73  cc 9e 86 3c 82 dd 1e 89  |!.1.9e.s...<....|
-000000a0  d3 8b 1a 01 28 36 6d b1  fd 37 85 ba a0 d8 e7 5e  |....(6m..7.....^|
-000000b0  93 99 0d 74 a9 d4 b2 04  8a 47 bf 70 61 6a 76 42  |...t.....G.pajvB|
-000000c0  13 e6 f0 50 60 74 c4 55  e4 b2 43 69 32 00        |...P't.U..Ci2.|
-000000ce
+00000000  d0 17 66 f2 cb b9 14 af  56 14 75 26 9b 89 50 f1  |..f.....V.u&..P.|
+00000010  4c a2 14 ed 58 58 82 a3  64 8d 98 e9 02 ff a0 e5  |L...XX..d.......|
+00000020  40 a7 bc 2e 81 65 24 68  3c c4 e3 c3 c3 de 2b 55  |@....e$h<.....+U|
+00000030  3c 1a d7 26 59 8f f7 cf  88 00 ac 06 4a b7 dc 25  |<..&Y.......J..%|
+00000040  75 46 60 6a 15 a9 2e 3a  ff 15 6d 25 39 25 15 71  |uF`j...:..m%9%.q|
+00000050  a1 10 55 28 cc 2d 7e 67  58 46 f6 8e 48 ce e3 7e  |..U(.-~gXF..H..~|
+00000060  4c 4c 7a b3 c6 c9 ef 4d  3a a0 3f 41 03 7e 2f 3f  |LLz....M:.?A.~/?|
+00000070  09 6d b3 74 4c d9 ae 5f  a5 ea 49 5d 8f f8 87 6f  |.m.tL.._..I]...o|
+00000080  c3 4a 7d 67                                       |.J}g|
+00000084
 ```
 
 ### usage
@@ -79,6 +75,9 @@ NAME:
 USAGE:
    goaes [global options] [command [command options]]
 
+VERSION:
+   0.7.0
+
 COMMANDS:
    generate, g  Generate a base64 encoded key
    encrypt, e   Encrypt a file
@@ -86,7 +85,8 @@ COMMANDS:
    help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h  show help
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
 ## reference material
