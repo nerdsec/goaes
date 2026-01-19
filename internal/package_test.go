@@ -23,7 +23,10 @@ func TestPackagePayload(t *testing.T) {
 		t.Error("package shouldn't be nil")
 	}
 
-	unpackaged := internal.UnpackagePayload(packaged)
+	unpackaged, err := internal.UnpackagePayload(packaged)
+	if err != nil {
+		t.Error("unexpected error unpackaging payload")
+	}
 
 	plaintext, err := internal.Decrypt(
 		passphrase,
