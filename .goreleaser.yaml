@@ -20,6 +20,8 @@ builds:
       - linux
       - windows
       - darwin
+      - freebsd
+      - openbsd
     main: ./cmd/goaes
     binary: goaes
     goarch:
