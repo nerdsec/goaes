@@ -2,6 +2,10 @@ version: 2
 updates:
 # Apps
   - package-ecosystem: "gomod"
-    directory: ""
+    directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
