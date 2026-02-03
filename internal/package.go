@@ -79,9 +79,6 @@ func UnpackagePayload(data []byte) (EncryptedDataPayload, error) {
 	offset += mLen
 
 	// Remaining bytes are ciphertext payload
-	if offset > len(data) {
-		return EncryptedDataPayload{}, errors.New("invalid payload offset")
-	}
 	payload := data[offset:]
 
 	return EncryptedDataPayload{
