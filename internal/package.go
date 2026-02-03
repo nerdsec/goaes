@@ -36,20 +36,20 @@ func PackagePayload(payload EncryptedDataPayload) []byte {
 
 func UnpackagePayload(data []byte) (EncryptedDataPayload, error) {
 	magic := []byte(magicBytes)
-	mLen := len(magic)
+	magicLength := len(magic)
 
 	// Must at least contain: magic + version + salt + dek + magic
-	minHeaderSize := mLen + 1 + saltLength + wrappedDEKLength + mLen
+	minHeaderSize := magicLength + 1 + saltLength + wrappedDEKLength + magicLength
 	if len(data) < minHeaderSize {
 		return EncryptedDataPayload{}, errors.New("data too short")
 	}
 
 	// Verify starting magic
-	if !bytes.Equal(data[:mLen], magic) {
+	if !bytes.Equal(data[:magicLength], magic) {
 		return EncryptedDataPayload{}, errors.New("invalid file format: missing starting magic bytes")
 	}
 
-	offset := mLen
+	offset := magicLength
 
 	// Version
 	version := data[offset]
@@ -73,10 +73,10 @@ func UnpackagePayload(data []byte) (EncryptedDataPayload, error) {
 	offset += wrappedDEKLength
 
 	// Verify ending magic
-	if len(data) < offset+mLen || !bytes.Equal(data[offset:offset+mLen], magic) {
+	if len(data) < offset+magicLength || !bytes.Equal(data[offset:offset+magicLength], magic) {
 		return EncryptedDataPayload{}, errors.New("invalid file format: missing ending magic bytes")
 	}
-	offset += mLen
+	offset += magicLength
 
 	// Remaining bytes are ciphertext payload
 	payload := data[offset:]
