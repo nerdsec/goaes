@@ -10,79 +10,46 @@ const (
 	formatVersion    = 0x01
 	saltLength       = 32
 	wrappedDEKLength = 60
+	headerLength     = len(magicBytes) + 1 + saltLength + wrappedDEKLength // magic + version + salt + edek
 )
 
 func PackagePayload(payload EncryptedDataPayload) []byte {
-	var buf bytes.Buffer
+	header := make([]byte, headerLength)
 
-	magic := []byte(magicBytes)
+	// Add magic bytes
+	copy(header, []byte(magicBytes))
+	// Add version
+	header[len(magicBytes)] = formatVersion
+	// Add salt and DEK
+	copy(header[len(magicBytes)+1:], payload.Salt)
+	copy(header[len(magicBytes)+1+len(payload.Salt):], payload.DEK)
 
-	// Start marker
-	buf.Write(magic)
+	buffer := make([]byte, headerLength+len(payload.Payload))
+	copy(buffer, header)
+	copy(buffer[len(header):], payload.Payload)
 
-	// Header contents
-	buf.WriteByte(formatVersion)
-	buf.Write(payload.Salt)
-	buf.Write(payload.DEK)
-
-	// End marker
-	buf.Write(magic)
-
-	// Ciphertext payload
-	buf.Write(payload.Payload)
-
-	return buf.Bytes()
+	return buffer
 }
 
 func UnpackagePayload(data []byte) (EncryptedDataPayload, error) {
-	magic := []byte(magicBytes)
-	mLen := len(magic)
-
-	// Must at least contain: magic + version + salt + dek + magic
-	minHeaderSize := mLen + 1 + saltLength + wrappedDEKLength + mLen
-	if len(data) < minHeaderSize {
+	if len(data) < headerLength {
 		return EncryptedDataPayload{}, errors.New("data too short")
 	}
 
-	// Verify starting magic
-	if !bytes.Equal(data[:mLen], magic) {
-		return EncryptedDataPayload{}, errors.New("invalid file format: missing starting magic bytes")
+	// Verify magic bytes
+	if !bytes.Equal(data[:len(magicBytes)], []byte(magicBytes)) {
+		return EncryptedDataPayload{}, errors.New("invalid file format: magic bytes mismatch")
 	}
 
-	offset := mLen
-
-	// Version
-	version := data[offset]
-	if version != formatVersion {
+	// Verify version
+	if data[len(magicBytes)] != formatVersion {
 		return EncryptedDataPayload{}, errors.New("unsupported format version")
 	}
-	offset++
 
-	// Salt
-	if len(data) < offset+saltLength {
-		return EncryptedDataPayload{}, errors.New("truncated salt")
-	}
+	offset := len(magicBytes) + 1
 	salt := data[offset : offset+saltLength]
-	offset += saltLength
-
-	// Wrapped DEK
-	if len(data) < offset+wrappedDEKLength {
-		return EncryptedDataPayload{}, errors.New("truncated wrapped DEK")
-	}
-	edek := data[offset : offset+wrappedDEKLength]
-	offset += wrappedDEKLength
-
-	// Verify ending magic
-	if len(data) < offset+mLen || !bytes.Equal(data[offset:offset+mLen], magic) {
-		return EncryptedDataPayload{}, errors.New("invalid file format: missing ending magic bytes")
-	}
-	offset += mLen
-
-	// Remaining bytes are ciphertext payload
-	if offset > len(data) {
-		return EncryptedDataPayload{}, errors.New("invalid payload offset")
-	}
-	payload := data[offset:]
+	edek := data[offset+saltLength : offset+saltLength+wrappedDEKLength]
+	payload := data[headerLength:]
 
 	return EncryptedDataPayload{
 		Salt:    Salt(salt),
