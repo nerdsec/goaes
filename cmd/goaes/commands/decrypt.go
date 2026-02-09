@@ -37,7 +37,12 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	plaintext, err := internal.Decrypt(passphrase, encryptedPayload.WrappedDEK, encryptedPayload.Payload, encryptedPayload.Salt)
+	plaintext, err := internal.Decrypt(
+		passphrase,
+		encryptedPayload.WrappedDEK,
+		encryptedPayload.Payload,
+		encryptedPayload.Salt,
+	)
 	if err != nil {
 		return err
 	}
