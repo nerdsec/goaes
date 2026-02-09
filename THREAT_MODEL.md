@@ -31,7 +31,7 @@ This threat model focuses on offline compromise scenarios (stolen encrypted file
 ### Data stored alongside ciphertext
 
 - File format version identifier (cleartext)
-- Salt (cleartext) if used for key derivation / domain separation / format evolution
+- Salt (cleartext) used for Argon2id key derivation
 
 Note: cleartext metadata is permitted as it does not reveal the key or plaintext.
 
@@ -82,7 +82,7 @@ This is a deliberate scoping decision: `goaes` is not attempting to be a complet
   - Prefer **32 random bytes** (256 bits) encoded as base64
   - Not a human-memorable password
 
-If the secret is not high entropy, offline guessing becomes viable and a password KDF would be required.
+Argon2id key derivation provides additional hardening against offline guessing, but a high-entropy secret remains the primary defense.
 
 ## Key management model
 
@@ -96,16 +96,15 @@ If the secret is not high entropy, offline guessing becomes viable and a passwor
 
 ### KDF position (current)
 
-- Not required if the environment secret is truly random high-entropy key material.
-- If users ever supply human-chosen secrets, the project should add an explicit "passphrase mode" using a memory-hard KDF (Argon2id).
+- All secrets are run through Argon2id (time=3, memory=256 MiB, threads=4, keyLen=32) with a random per-file salt to derive the KEK.
+- This hardens against offline brute-force even if the supplied secret has less-than-ideal entropy.
 
 ## Threats and mitigations
 
 ### T1: Offline brute force / guessing
 
 **Threat:** Attacker steals encrypted files and attempts to guess the key.
-**Mitigation:** Use a high-entropy secret (32 random bytes).
-**Notes:** A KDF is not necessary for truly random keys, but becomes necessary for human-chosen secrets.
+**Mitigation:** Use a high-entropy secret (32 random bytes). All secrets are additionally hardened by Argon2id key derivation with a random per-file salt.
 
 ### T2: Ciphertext tampering / corruption
 
@@ -120,7 +119,7 @@ If the secret is not high entropy, offline guessing becomes viable and a passwor
 ### T4: Metadata manipulation (version/salt)
 
 **Threat:** Attacker edits metadata to influence parsing or key derivation logic.
-**Mitigation:** Authenticate relevant metadata by binding it into AEAD (AAD). At minimum, authenticate the version field and any salt/parameters that affect keying.
+**Mitigation:** Domain-separation strings are bound into AAD (`"wrap:dek:v1"` and `"data:msg:v1"`), preventing cross-context confusion attacks. The salt is authenticated indirectly: tampering with it causes Argon2id to derive the wrong KEK, which fails at DEK unwrap (AEAD authentication error).
 
 ### T5: Key disclosure via operational mistakes
 
@@ -146,15 +145,14 @@ If the secret is not high entropy, offline guessing becomes viable and a passwor
   - Ciphertext (including auth tag)
   - Optional salt (cleartext), if used
 - Bind into AAD:
-  - Version
-  - Salt (and any future KDF params)
+  - `"wrap:dek:v1"` for DEK wrapping operations (domain-separates key wrapping from data encryption)
+  - `"data:msg:v1"` for data encryption operations
 - Zero/overwrite sensitive buffers where practical (best-effort; Go does not guarantee).
 - Provide a deterministic test vector suite to prevent accidental format/crypto regressions.
 
 ## Open design decisions (explicit)
 
-- **Passphrase mode:** Not currently supported. If added, it must be explicit and use Argon2id with published parameters.
-- **Key rotation / crypto-erasure:** Not currently a priority. If implemented later, it will likely require a KEK/DEK envelope scheme with header metadata and versioned key slots.
+- **Key rotation / crypto-erasure:** Not currently a priority. The existing KEK/DEK envelope scheme provides a foundation for future key rotation support with header metadata and versioned key slots.
 - **Threat boundary:** The tool does not attempt to protect against runtime compromise or secret exfiltration from the host environment.
 
 ## "Secure by default" guidance for users

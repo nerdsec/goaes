@@ -2,8 +2,6 @@ package commands
 
 import (
 	"context"
-	"io"
-	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -23,19 +21,13 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 		return cli.Exit("missing destination", invalidArgsExit)
 	}
 
-	source = filepath.Clean(source)
-	file, err := os.Open(source)
-	if err != nil {
-		return err
+	passphrase := os.Getenv(passphraseEnvVar)
+	if passphrase == "" {
+		return cli.Exit("GOAES_PASSPHRASE environment variable is not set", 1)
 	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			slog.Error("failed to close file", "error", err)
-		}
-	}()
 
-	data, err := io.ReadAll(file)
+	source = filepath.Clean(source)
+	data, err := os.ReadFile(source)
 	if err != nil {
 		return err
 	}
@@ -45,18 +37,12 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	passphrase := os.Getenv(PassphraseEnvVar)
-
-	plaintext, err := internal.Decrypt(passphrase, encryptedPayload.DEK, encryptedPayload.Payload, encryptedPayload.Salt)
+	plaintext, err := internal.Decrypt(passphrase, encryptedPayload.WrappedDEK, encryptedPayload.Payload, encryptedPayload.Salt)
 	if err != nil {
 		return err
 	}
 
 	destination = filepath.Clean(destination)
-	err = os.WriteFile(destination, plaintext, fileMode)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return os.WriteFile(destination, plaintext, fileMode)
 }

@@ -22,7 +22,7 @@ func TestNewDEK(t *testing.T) {
 		t.Run(fmt.Sprintf("TestNewDek %d", i), func(t *testing.T) {
 			dek, err := internal.NewDEK()
 			if err != nil {
-				t.Errorf("failed to create dek. error: %v", err)
+				t.Fatalf("failed to create dek. error: %v", err)
 			}
 
 			if len(dek) < minSize {
@@ -37,7 +37,7 @@ func TestNewSalt(t *testing.T) {
 		t.Run(fmt.Sprintf("TestNewSalt %d", i), func(t *testing.T) {
 			salt, err := internal.NewSalt()
 			if err != nil {
-				t.Errorf("failed to create salt. error: %v", err)
+				t.Fatalf("failed to create salt. error: %v", err)
 			}
 
 			if len(salt) < minSize {
@@ -193,5 +193,116 @@ func TestDecryptData(t *testing.T) {
 
 	if !bytes.Equal(input, pt) {
 		t.Error("decrypted doesn't match input")
+	}
+}
+
+func TestDecryptWithWrongKey(t *testing.T) {
+	input := []byte("hello")
+
+	dek, err := internal.NewDEK()
+	if err != nil {
+		t.Fatalf("failed to create dek: %v", err)
+	}
+
+	ct, err := internal.EncryptData(input, dek)
+	if err != nil {
+		t.Fatalf("failed to encrypt: %v", err)
+	}
+
+	wrongDEK, err := internal.NewDEK()
+	if err != nil {
+		t.Fatalf("failed to create wrong dek: %v", err)
+	}
+
+	_, err = internal.DecryptData(ct, wrongDEK)
+	if err == nil {
+		t.Error("decryption with wrong key should fail")
+	}
+}
+
+func TestDecryptTamperedCiphertext(t *testing.T) {
+	input := []byte("hello")
+
+	dek, err := internal.NewDEK()
+	if err != nil {
+		t.Fatalf("failed to create dek: %v", err)
+	}
+
+	ct, err := internal.EncryptData(input, dek)
+	if err != nil {
+		t.Fatalf("failed to encrypt: %v", err)
+	}
+
+	// Flip a byte in the ciphertext body (after the nonce)
+	tampered := make([]byte, len(ct))
+	copy(tampered, ct)
+	tampered[len(tampered)-1] ^= 0xff
+
+	_, err = internal.DecryptData(tampered, dek)
+	if err == nil {
+		t.Error("decryption of tampered ciphertext should fail")
+	}
+}
+
+func TestEncryptDecryptEmptyPlaintext(t *testing.T) {
+	input := []byte{}
+
+	dek, err := internal.NewDEK()
+	if err != nil {
+		t.Fatalf("failed to create dek: %v", err)
+	}
+
+	ct, err := internal.EncryptData(input, dek)
+	if err != nil {
+		t.Fatalf("failed to encrypt empty plaintext: %v", err)
+	}
+
+	pt, err := internal.DecryptData(ct, dek)
+	if err != nil {
+		t.Fatalf("failed to decrypt empty plaintext: %v", err)
+	}
+
+	if len(pt) != 0 {
+		t.Errorf("expected empty plaintext, got %d bytes", len(pt))
+	}
+}
+
+func TestEncryptDecryptRoundtrip(t *testing.T) {
+	//nolint:gosec // this is only for testing
+	passphrase := validPassphrase
+	input := []byte("round trip test message")
+
+	payload, err := internal.Encrypt(passphrase, input)
+	if err != nil {
+		t.Fatalf("failed to encrypt: %v", err)
+	}
+
+	pt, err := internal.Decrypt(passphrase, payload.WrappedDEK, payload.Payload, payload.Salt)
+	if err != nil {
+		t.Fatalf("failed to decrypt: %v", err)
+	}
+
+	if !bytes.Equal(input, pt) {
+		t.Error("round-trip plaintext doesn't match")
+	}
+}
+
+func TestDecryptWithWrongPassphrase(t *testing.T) {
+	//nolint:gosec // this is only for testing
+	passphrase := validPassphrase
+	input := []byte("secret message")
+
+	payload, err := internal.Encrypt(passphrase, input)
+	if err != nil {
+		t.Fatalf("failed to encrypt: %v", err)
+	}
+
+	// Use a different valid base64 passphrase
+	//nolint:gosec // this is only for testing
+	wrongPassphrase := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+
+	_, err = internal.Decrypt(wrongPassphrase, payload.WrappedDEK, payload.Payload, payload.Salt)
+	if err == nil {
+		t.Error("decryption with wrong passphrase should fail")
 	}
 }

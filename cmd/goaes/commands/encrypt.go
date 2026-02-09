@@ -21,26 +21,28 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 		destination = source + ".goaes"
 	}
 
+	passphrase := os.Getenv(passphraseEnvVar)
+	if passphrase == "" {
+		return cli.Exit("GOAES_PASSPHRASE environment variable is not set", 1)
+	}
+
 	source = filepath.Clean(source)
 	plaintext, err := os.ReadFile(source)
 	if err != nil {
 		return err
 	}
 
-	passphrase := os.Getenv(PassphraseEnvVar)
-
 	payload, err := internal.Encrypt(passphrase, plaintext)
 	if err != nil {
 		return err
 	}
 
-	buffer := internal.PackagePayload(payload)
-
-	destination = filepath.Clean(destination)
-	err = os.WriteFile(destination, buffer, fileMode)
+	buffer, err := internal.PackagePayload(payload)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	destination = filepath.Clean(destination)
+
+	return os.WriteFile(destination, buffer, fileMode)
 }

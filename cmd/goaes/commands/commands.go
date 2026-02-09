@@ -2,6 +2,6 @@ package commands
 
 const (
 	fileMode         = 0600
-	PassphraseEnvVar = "GOAES_PASSPHRASE"
+	passphraseEnvVar = "GOAES_PASSPHRASE"
 	invalidArgsExit  = 2
 )

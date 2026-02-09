@@ -14,6 +14,7 @@ func Generate(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+	defer internal.Clear(key)
 
 	fmt.Println(base64.StdEncoding.EncodeToString(key))
 

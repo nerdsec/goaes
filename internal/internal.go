@@ -1,6 +1,10 @@
 package internal
 
-import "errors"
+import (
+	"crypto/subtle"
+	"errors"
+	"fmt"
+)
 
 type (
 	KEK        []byte
@@ -11,9 +15,9 @@ type (
 )
 
 type EncryptedDataPayload struct {
-	DEK     WrappedDEK
-	Salt    Salt
-	Payload Ciphertext
+	WrappedDEK WrappedDEK
+	Salt       Salt
+	Payload    Ciphertext
 }
 
 var (
@@ -22,8 +26,23 @@ var (
 	errBadKeyLn = errors.New("invalid key length: must be 16, 24, or 32 bytes")
 )
 
-func clear(b []byte) {
-	for i := range b {
-		b[i] = 0
+const (
+	saltLen       = 32
+	wrappedDEKLen = 60
+)
+
+func Clear(b []byte) {
+	subtle.XORBytes(b, b, b)
+}
+
+func validPayloadLengths(salt Salt, edek WrappedDEK) error {
+	if len(salt) != saltLen {
+		return fmt.Errorf("unexpected salt length: %d", len(salt))
 	}
+
+	if len(edek) != wrappedDEKLen {
+		return fmt.Errorf("unexpected wrapped DEK length: %d", len(edek))
+	}
+
+	return nil
 }

@@ -6,29 +6,24 @@ import (
 )
 
 const (
-	magicBytes       = "GOAES"
-	formatVersion    = 0x01
-	saltLength       = 32
-	wrappedDEKLength = 60
-	headerLength     = len(magicBytes) + 1 + saltLength + wrappedDEKLength // magic + version + salt + edek
+	magicBytes    = "GOAES"
+	formatVersion = 0x01
+	headerLength  = len(magicBytes) + 1 + saltLen + wrappedDEKLen // magic + version + salt + edek
 )
 
-func PackagePayload(payload EncryptedDataPayload) []byte {
-	header := make([]byte, headerLength)
+func PackagePayload(payload EncryptedDataPayload) ([]byte, error) {
+	if err := validPayloadLengths(payload.Salt, payload.WrappedDEK); err != nil {
+		return nil, err
+	}
 
-	// Add magic bytes
-	copy(header, []byte(magicBytes))
-	// Add version
-	header[len(magicBytes)] = formatVersion
-	// Add salt and DEK
-	copy(header[len(magicBytes)+1:], payload.Salt)
-	copy(header[len(magicBytes)+1+len(payload.Salt):], payload.DEK)
+	buf := make([]byte, headerLength+len(payload.Payload))
+	copy(buf, []byte(magicBytes))
+	buf[len(magicBytes)] = formatVersion
+	copy(buf[len(magicBytes)+1:], payload.Salt)
+	copy(buf[len(magicBytes)+1+saltLen:], payload.WrappedDEK)
+	copy(buf[headerLength:], payload.Payload)
 
-	buffer := make([]byte, headerLength+len(payload.Payload))
-	copy(buffer, header)
-	copy(buffer[len(header):], payload.Payload)
-
-	return buffer
+	return buf, nil
 }
 
 func UnpackagePayload(data []byte) (EncryptedDataPayload, error) {
@@ -36,24 +31,28 @@ func UnpackagePayload(data []byte) (EncryptedDataPayload, error) {
 		return EncryptedDataPayload{}, errors.New("data too short")
 	}
 
-	// Verify magic bytes
 	if !bytes.Equal(data[:len(magicBytes)], []byte(magicBytes)) {
 		return EncryptedDataPayload{}, errors.New("invalid file format: magic bytes mismatch")
 	}
 
-	// Verify version
 	if data[len(magicBytes)] != formatVersion {
 		return EncryptedDataPayload{}, errors.New("unsupported format version")
 	}
 
 	offset := len(magicBytes) + 1
-	salt := data[offset : offset+saltLength]
-	edek := data[offset+saltLength : offset+saltLength+wrappedDEKLength]
-	payload := data[headerLength:]
+
+	salt := make([]byte, saltLen)
+	copy(salt, data[offset:offset+saltLen])
+
+	edek := make([]byte, wrappedDEKLen)
+	copy(edek, data[offset+saltLen:offset+saltLen+wrappedDEKLen])
+
+	payload := make([]byte, len(data)-headerLength)
+	copy(payload, data[headerLength:])
 
 	return EncryptedDataPayload{
-		Salt:    Salt(salt),
-		DEK:     WrappedDEK(edek),
-		Payload: Ciphertext(payload),
+		Salt:       Salt(salt),
+		WrappedDEK: WrappedDEK(edek),
+		Payload:    Ciphertext(payload),
 	}, nil
 }

@@ -19,13 +19,13 @@ func Encrypt(passphrase string, data []byte) (EncryptedDataPayload, error) {
 	if err != nil {
 		return EncryptedDataPayload{}, err
 	}
-	defer clear(kek)
+	defer Clear(kek)
 
 	dek, err := NewDEK()
 	if err != nil {
 		return EncryptedDataPayload{}, err
 	}
-	defer clear(dek)
+	defer Clear(dek)
 
 	edek, err := WrapDEK(dek, kek)
 	if err != nil {
@@ -38,8 +38,8 @@ func Encrypt(passphrase string, data []byte) (EncryptedDataPayload, error) {
 	}
 
 	return EncryptedDataPayload{
-		DEK:     edek,
-		Salt:    salt,
-		Payload: ct,
+		WrappedDEK: edek,
+		Salt:       salt,
+		Payload:    ct,
 	}, nil
 }

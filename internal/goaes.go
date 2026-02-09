@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	time    = 3
-	memory  = 256 * 1024 // 256mb
-	threads = 4
-	keyLen  = 32
+	argonTime = 3
+	memory    = 256 * 1024 // 256 MiB
+	threads   = 4
+	keyLen    = 32
 )
 
 func NewKEKFromEnvB64(b64Passphrase string, salt Salt) (KEK, error) {
@@ -25,7 +25,9 @@ func NewKEKFromEnvB64(b64Passphrase string, salt Salt) (KEK, error) {
 		return nil, fmt.Errorf("decode passphrase base64: %w", err)
 	}
 
-	raw := argon2.IDKey(passphrase, salt, time, memory, threads, keyLen)
+	defer Clear(passphrase)
+
+	raw := argon2.IDKey(passphrase, salt, argonTime, memory, threads, keyLen)
 
 	if !validAESKeyLen(len(raw)) {
 		return nil, errBadKeyLn
