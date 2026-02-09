@@ -25,11 +25,13 @@ func Decrypt(passphrase string, edek WrappedDEK, ct Ciphertext, salt Salt) ([]by
 	if err != nil {
 		return nil, err
 	}
+	defer clear(kek)
 
 	dek, err := UnwrapDEK(edek, kek)
 	if err != nil {
 		return nil, err
 	}
+	defer clear(dek)
 
 	pt, err := DecryptData(ct, dek)
 	if err != nil {

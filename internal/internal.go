@@ -21,3 +21,9 @@ var (
 	aadDataMsg  = []byte("data:msg:v1")
 	errBadKeyLn = errors.New("invalid key length: must be 16, 24, or 32 bytes")
 )
+
+func clear(b []byte) {
+	for i := range b {
+		b[i] = 0
+	}
+}

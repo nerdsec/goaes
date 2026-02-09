@@ -9,7 +9,8 @@ import (
 
 func TestPackagePayload(t *testing.T) {
 	const (
-		passphrase = "test"
+		//nolint:gosec // this is only for testing and not used for any implementation
+		passphrase = "dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg="
 		message    = "hello"
 	)
 

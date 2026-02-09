@@ -22,7 +22,7 @@ const (
 func NewKEKFromEnvB64(b64Passphrase string, salt Salt) (KEK, error) {
 	passphrase, err := base64.StdEncoding.DecodeString(b64Passphrase)
 	if err != nil {
-		return nil, fmt.Errorf("decode %s base64: %w", b64Passphrase, err)
+		return nil, fmt.Errorf("decode passphrase base64: %w", err)
 	}
 
 	raw := argon2.IDKey(passphrase, salt, time, memory, threads, keyLen)
