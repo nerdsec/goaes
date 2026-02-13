@@ -86,7 +86,8 @@ func TestVersionRegression(t *testing.T) {
 		plaintext string
 	}{
 		{
-			version:   "v1.0.0",
+			version: "v1.0.0",
+			//nolint:lll // part of a test
 			payload:   `R09BRVMBZxsY8Rtp6lCN+guCcX+o5T06kTJKd8TCgLjzRkHWYypNpXL2tNiXTRpWsy2JM4F8xi/ylhbrLmIwnTKxIz6FtwUQK/Gd0adOY9cRh/Fxz773sNpm9W9fe1vaFEJJJZWbkD76tphS1difZGhwtNe7FUOnexOZeewStcuvXwGt`,
 			plaintext: "v1.0.0",
 		},
