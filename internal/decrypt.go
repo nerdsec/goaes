@@ -33,6 +33,7 @@ func Decrypt(passphrase string, edek WrappedDEK, ct Ciphertext, salt Salt) ([]by
 		kek, err := NewKEKFromEnvB64(passphrase, salt)
 		if err != nil {
 			retErr = err
+
 			return
 		}
 		defer Clear(kek)
@@ -40,6 +41,7 @@ func Decrypt(passphrase string, edek WrappedDEK, ct Ciphertext, salt Salt) ([]by
 		dek, err := UnwrapDEK(edek, kek)
 		if err != nil {
 			retErr = err
+
 			return
 		}
 		defer Clear(dek)
@@ -47,6 +49,7 @@ func Decrypt(passphrase string, edek WrappedDEK, ct Ciphertext, salt Salt) ([]by
 		plaintext, err := DecryptData(ct, dek)
 		if err != nil {
 			retErr = err
+
 			return
 		}
 

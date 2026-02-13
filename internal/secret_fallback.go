@@ -7,3 +7,7 @@ package internal
 func SecretDo(f func()) {
 	f()
 }
+
+func SecretEnabled() bool {
+	return false
+}

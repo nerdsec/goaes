@@ -9,3 +9,7 @@ import "runtime/secret"
 func SecretDo(f func()) {
 	secret.Do(f)
 }
+
+func SecretEnabled() bool {
+	return secret.Enabled()
+}

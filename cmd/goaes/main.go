@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/nerdsec/goaes/cmd/goaes/commands"
+	"github.com/nerdsec/goaes/internal"
 	"github.com/urfave/cli/v3"
 )
 
@@ -20,6 +21,9 @@ func main() {
 		Version: version,
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			return cli.DefaultShowRootCommandHelp(cmd)
+		},
+		Metadata: map[string]interface{}{
+			"secret.mode": internal.SecretEnabled(),
 		},
 		Commands: []*cli.Command{
 			{
