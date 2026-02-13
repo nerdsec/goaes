@@ -1,6 +1,6 @@
 module github.com/nerdsec/goaes
 
-go 1.25
+go 1.26
 
 require (
 	github.com/urfave/cli/v3 v3.6.2
