@@ -44,6 +44,8 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	defer internal.Clear(plaintext)
+
 	payload, err := internal.Encrypt(passphrase, plaintext)
 	if err != nil {
 		return err

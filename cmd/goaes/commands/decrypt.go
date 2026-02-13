@@ -59,5 +59,7 @@ func Decrypt(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	defer internal.Clear(plaintext)
+
 	return os.WriteFile(destination, plaintext, fileMode)
 }
