@@ -60,6 +60,12 @@ func main() {
 					},
 				},
 			},
+			{
+				Name:    "features",
+				Aliases: []string{"f"},
+				Usage:   "Show features enabled",
+				Action:  commands.Features,
+			},
 		},
 	}
 
