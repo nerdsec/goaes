@@ -21,10 +21,12 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 		destination = source + ".goaes"
 	}
 
-	passphrase := os.Getenv(passphraseEnvVar)
-	if passphrase == "" {
+	passphrase := []byte(os.Getenv(passphraseEnvVar))
+	if len(passphrase) == 0 {
 		return cli.Exit("GOAES_PASSPHRASE environment variable is not set", 1)
 	}
+
+	defer internal.Clear(passphrase)
 
 	source = filepath.Clean(source)
 	plaintext, err := os.ReadFile(source)

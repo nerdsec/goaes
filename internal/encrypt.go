@@ -10,7 +10,7 @@ import "errors"
 // DEK, decoded passphrase, and internal crypto buffers) are automatically zeroed
 // by the runtime after secretDo returns. The manual Clear calls are retained as
 // defense-in-depth for platforms without secret mode support.
-func Encrypt(passphrase string, data []byte) (EncryptedDataPayload, error) {
+func Encrypt(passphrase []byte, data []byte) (EncryptedDataPayload, error) {
 	if len(passphrase) == 0 {
 		return EncryptedDataPayload{}, errors.New("passphrase cannot be empty")
 	}

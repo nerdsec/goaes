@@ -12,10 +12,10 @@ const (
 	totalIterationTests = 10
 	minSize             = 32
 	minWrappedDEKSize   = 60
-
-	//nolint:gosec // this is only for testing and not used for any implementation
-	validPassphrase = "dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg="
 )
+
+//nolint:gosec // this is only for testing and not used for any implementation
+var validPassphrase = []byte("dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg=")
 
 func TestNewDEK(t *testing.T) {
 	for i := range totalIterationTests {
@@ -50,7 +50,7 @@ func TestNewSalt(t *testing.T) {
 func TestNewKEKFromEnvB64(t *testing.T) {
 	tests := []struct {
 		name       string
-		passphrase string
+		passphrase []byte
 		salt       internal.Salt
 		wantErr    bool
 	}{
@@ -62,7 +62,7 @@ func TestNewKEKFromEnvB64(t *testing.T) {
 		},
 		{
 			name:       "Invalid passphrase base64",
-			passphrase: "dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6eqLufQg=",
+			passphrase: []byte("dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6eqLufQg="),
 			salt:       []byte("kD+tNSxjss1XchcyyrKJyZBGg2mdmhh/IO3I87WW2Ds="),
 			wantErr:    true,
 		},
@@ -268,16 +268,14 @@ func TestEncryptDecryptEmptyPlaintext(t *testing.T) {
 }
 
 func TestEncryptDecryptRoundtrip(t *testing.T) {
-	//nolint:gosec // this is only for testing
-	passphrase := validPassphrase
 	input := []byte("round trip test message")
 
-	payload, err := internal.Encrypt(passphrase, input)
+	payload, err := internal.Encrypt(validPassphrase, input)
 	if err != nil {
 		t.Fatalf("failed to encrypt: %v", err)
 	}
 
-	pt, err := internal.Decrypt(passphrase, payload.WrappedDEK, payload.Payload, payload.Salt)
+	pt, err := internal.Decrypt(validPassphrase, payload.WrappedDEK, payload.Payload, payload.Salt)
 	if err != nil {
 		t.Fatalf("failed to decrypt: %v", err)
 	}
@@ -288,18 +286,16 @@ func TestEncryptDecryptRoundtrip(t *testing.T) {
 }
 
 func TestDecryptWithWrongPassphrase(t *testing.T) {
-	//nolint:gosec // this is only for testing
-	passphrase := validPassphrase
 	input := []byte("secret message")
 
-	payload, err := internal.Encrypt(passphrase, input)
+	payload, err := internal.Encrypt(validPassphrase, input)
 	if err != nil {
 		t.Fatalf("failed to encrypt: %v", err)
 	}
 
 	// Use a different valid base64 passphrase
 	//nolint:gosec // this is only for testing
-	wrongPassphrase := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+	wrongPassphrase := []byte("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
 
 	_, err = internal.Decrypt(wrongPassphrase, payload.WrappedDEK, payload.Payload, payload.Salt)
 	if err == nil {

@@ -8,11 +8,9 @@ import (
 )
 
 func TestPackagePayload(t *testing.T) {
-	const (
-		//nolint:gosec // this is only for testing and not used for any implementation
-		passphrase = "dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg="
-		message    = "hello"
-	)
+	//nolint:gosec // this is only for testing and not used for any implementation
+	passphrase := []byte("dJyHOdMbG94EMvQGQrs6YZiXGiAGQgDYtx6+eqLufQg=")
+	message := "hello"
 
 	payload, err := internal.Encrypt(passphrase, []byte(message))
 	if err != nil {

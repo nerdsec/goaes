@@ -19,12 +19,15 @@ const (
 	keyLen    = 32
 )
 
-func NewKEKFromEnvB64(b64Passphrase string, salt Salt) (KEK, error) {
-	passphrase, err := base64.StdEncoding.DecodeString(b64Passphrase)
+func NewKEKFromEnvB64(b64Passphrase []byte, salt Salt) (KEK, error) {
+	passphrase := make([]byte, base64.StdEncoding.DecodedLen(len(b64Passphrase)))
+
+	n, err := base64.StdEncoding.Decode(passphrase, b64Passphrase)
 	if err != nil {
 		return nil, fmt.Errorf("decode passphrase base64: %w", err)
 	}
 
+	passphrase = passphrase[:n]
 	defer Clear(passphrase)
 
 	raw := argon2.IDKey(passphrase, salt, argonTime, memory, threads, keyLen)
