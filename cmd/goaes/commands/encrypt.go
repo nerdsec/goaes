@@ -29,6 +29,11 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 	defer internal.Clear(passphrase)
 
 	source = filepath.Clean(source)
+	destination = filepath.Clean(destination)
+
+	if source == destination {
+		return errSamePath
+	}
 
 	if err := checkFileSize(source); err != nil {
 		return err
@@ -48,8 +53,6 @@ func Encrypt(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
-
-	destination = filepath.Clean(destination)
 
 	return os.WriteFile(destination, buffer, fileMode)
 }

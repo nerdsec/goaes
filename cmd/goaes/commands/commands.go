@@ -12,6 +12,8 @@ const (
 	maxFileSize      = 1 << 30 // 1 GiB
 )
 
+var errSamePath = fmt.Errorf("source and destination must be different files")
+
 func checkFileSize(path string) error {
 	info, err := os.Stat(path)
 	if err != nil {
