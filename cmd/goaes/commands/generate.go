@@ -10,13 +10,25 @@ import (
 )
 
 func Generate(ctx context.Context, cmd *cli.Command) error {
-	key, err := internal.NewDEK()
-	if err != nil {
-		return err
-	}
-	defer internal.Clear(key)
+	var encoded string
+	var retErr error
 
-	fmt.Println(base64.StdEncoding.EncodeToString(key))
+	internal.SecretDo(func() {
+		key, err := internal.NewDEK()
+		if err != nil {
+			retErr = err
+			return
+		}
+		defer internal.Clear(key)
+
+		encoded = base64.StdEncoding.EncodeToString(key)
+	})
+
+	if retErr != nil {
+		return retErr
+	}
+
+	fmt.Println(encoded)
 
 	return nil
 }
