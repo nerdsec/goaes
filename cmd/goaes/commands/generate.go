@@ -10,7 +10,6 @@ import (
 )
 
 func Generate(ctx context.Context, cmd *cli.Command) error {
-	var encoded string
 	var retErr error
 
 	internal.SecretDo(func() {
@@ -22,14 +21,12 @@ func Generate(ctx context.Context, cmd *cli.Command) error {
 		}
 		defer internal.Clear(key)
 
-		encoded = base64.StdEncoding.EncodeToString(key)
+		encoded := make([]byte, base64.StdEncoding.EncodedLen(len(key)))
+		base64.StdEncoding.Encode(encoded, key)
+		defer internal.Clear(encoded)
+
+		fmt.Println(string(encoded))
 	})
 
-	if retErr != nil {
-		return retErr
-	}
-
-	fmt.Println(encoded)
-
-	return nil
+	return retErr
 }
