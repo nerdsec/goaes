@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"crypto/subtle"
 	"errors"
 	"fmt"
 )
@@ -32,7 +31,7 @@ const (
 )
 
 func Clear(b []byte) {
-	subtle.XORBytes(b, b, b)
+	clear(b)
 }
 
 func validPayloadLengths(salt Salt, edek WrappedDEK) error {
