@@ -11,5 +11,5 @@ func SecretDo(f func()) {
 }
 
 func SecretEnabled() bool {
-	return secret.Enabled()
+	return true
 }
