@@ -17,6 +17,7 @@ func Generate(ctx context.Context, cmd *cli.Command) error {
 		key, err := internal.NewDEK()
 		if err != nil {
 			retErr = err
+
 			return
 		}
 		defer internal.Clear(key)
