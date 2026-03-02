@@ -3,7 +3,7 @@ module github.com/nerdsec/goaes
 go 1.26
 
 require (
-	github.com/urfave/cli/v3 v3.6.2
+	github.com/urfave/cli/v3 v3.7.0
 	golang.org/x/crypto v0.47.0
 )
 
